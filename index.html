@@ -12,6 +12,7 @@
   --text:#F6F3EC;--muted:#A9A198;--max:1180px;
 }
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 button,a{font:inherit}
@@ -89,7 +90,7 @@ h1{font-size:clamp(40px,7vw,82px);line-height:.98;font-weight:400;margin:18px 0}
 .project-info p{color:var(--muted);line-height:1.7;max-width:680px}
 .footer{padding:30px 0;border-top:1px solid var(--line);color:#706960;font-size:10px;letter-spacing:.1em}
 @media(max-width:760px){
-  .nav{display:none}.menu{display:block}
+  .nav{display:none}.nav.mobile-open{display:flex;position:absolute;top:68px;right:16px;flex-direction:column;gap:14px;padding:16px 18px;background:rgba(23,19,15,.98);border:1px solid var(--line);min-width:140px}.menu{display:block}
   .hero-grid,.about{grid-template-columns:1fr;gap:28px}
   .hero{padding:55px 0}.hero-portrait{max-width:420px}
   .grid{grid-template-columns:1fr}
@@ -103,7 +104,7 @@ h1{font-size:clamp(40px,7vw,82px);line-height:.98;font-weight:400;margin:18px 0}
   <div class="landing-content">
     <div class="mark">MIEMARIUN</div>
     <div class="subtitle">ARCHITECTURAL STUDIO</div>
-    <button class="enter" onclick="enterPortfolio()">ENTER PORTFOLIO</button>
+    <button id="enterBtn" class="enter" type="button" onclick="enterPortfolio()" aria-label="Enter portfolio">ENTER PORTFOLIO</button>
   </div>
 </div>
 
@@ -213,25 +214,34 @@ let currentProject=0,currentImage=0;
 const totalImages=6;
 
 function enterPortfolio(){
- document.getElementById('landing').hidden=true;
- document.getElementById('site').hidden=false;
+ const landing=document.getElementById('landing');
+ const site=document.getElementById('site');
+ if(!landing || !site) return;
+ landing.hidden=true;
+ site.hidden=false;
  showView('home');
+ history.replaceState(null,'','#home');
 }
+
 function showView(view){
+ if(!['home','work','about','project'].includes(view)) view='home';
  document.querySelectorAll('.home-view,.work-view,.about-view').forEach(x=>x.classList.add('hidden'));
  document.getElementById('project').classList.remove('open');
  if(view==='home')document.getElementById('home').classList.remove('hidden');
  if(view==='work'){document.getElementById('work').classList.remove('hidden');renderProjects('ALL')}
  if(view==='about')document.getElementById('about').classList.remove('hidden');
  if(view==='project'){document.getElementById('project').classList.add('open');renderProject()}
- window.scrollTo({top:0,behavior:'smooth'});
+ window.scrollTo({top:0,behavior:'auto'});
  document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
  const n=document.getElementById('nav-'+view); if(n)n.classList.add('active');
 }
 function toggleMenu(){
  const nav=document.querySelector('.nav');
- nav.style.display=nav.style.display==='flex'?'none':'flex';
+ if(!nav) return;
+ const open=nav.classList.toggle('mobile-open');
+ nav.style.display=open?'flex':'';
 }
+
 function renderProjects(filter){
  const grid=document.getElementById('projectGrid');
  grid.innerHTML=projects.filter(p=>filter==='ALL'||p.type===filter).map(p=>`
@@ -248,9 +258,13 @@ function filterWork(filter,btn){
  document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
  renderProjects(filter);
 }
-function openProject(index){currentProject=index;currentImage=0;showView('project')}
+function openProject(index){
+ if(index<0 || index>=projects.length) index=0;
+ currentProject=index;currentImage=0;showView('project');
+}
+
 function renderProject(){
- const p=projects[currentProject];
+ const p=projects[currentProject] || projects[0];
  document.getElementById('projectCounter').textContent=`${String(currentProject+1).padStart(2,'0')} / ${String(projects.length).padStart(2,'0')}`;
  document.getElementById('projectType').textContent=p.type;
  document.getElementById('projectTitle').textContent=p.title;
@@ -266,7 +280,32 @@ function updateGallery(){
 function nextImage(){currentImage=(currentImage+1)%totalImages;updateGallery()}
 function prevImage(){currentImage=(currentImage-1+totalImages)%totalImages;updateGallery()}
 function nextProject(){currentProject=(currentProject+1)%projects.length;currentImage=0;renderProject()}
+
+// Initialize only after all functions exist. Inline onclick on ENTER is a fallback
+// so the landing transition still works if a cached script prevents the listener from attaching.
 renderProjects('ALL');
+window.addEventListener('popstate',()=>{
+ const view=location.hash.replace('#','');
+ if(document.getElementById('site').hidden) return;
+ showView(['home','work','about','project'].includes(view)?view:'home');
+});
+const enterBtn=document.getElementById('enterBtn');
+if(enterBtn) enterBtn.addEventListener('click', enterPortfolio);
+let touchStartX=0,touchStartY=0;
+const gallery=document.getElementById('galleryImage');
+if(gallery){
+ gallery.addEventListener('touchstart',e=>{const t=e.changedTouches[0];touchStartX=t.clientX;touchStartY=t.clientY;},{passive:true});
+ gallery.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-touchStartX,dy=t.clientY-touchStartY;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){dx<0?nextImage():prevImage();}},{passive:true});
+}
+document.addEventListener('keydown',e=>{
+ if(document.getElementById('project').classList.contains('open')){
+  if(e.key==='ArrowLeft') prevImage();
+  if(e.key==='ArrowRight') nextImage();
+  if(e.key==='Escape') showView('work');
+ }
+});
+
+
 </script>
 </body>
 </html>
