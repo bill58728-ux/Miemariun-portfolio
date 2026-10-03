@@ -111,7 +111,7 @@ h1{font-size:clamp(40px,7vw,82px);line-height:.98;font-weight:400;margin:18px 0}
 <div id="site" class="page" hidden>
 <header class="header">
   <div class="container header-inner">
-    <a class="logo" href="#home" onclick="showView('home')">MIEMARIUN</a>
+    <a class="logo" href="#work" onclick="showView('work')">MIEMARIUN</a>
     <nav class="nav">
       <a id="nav-work" href="#work" onclick="showView('work')">WORK</a>
       <a id="nav-about" href="#about" onclick="showView('about')">ABOUT</a>
@@ -219,8 +219,8 @@ function enterPortfolio(){
  if(!landing || !site) return;
  landing.hidden=true;
  site.hidden=false;
- showView('home');
- history.replaceState(null,'','#home');
+ showView('work');
+ history.replaceState(null,'','#work');
 }
 
 function showView(view){
