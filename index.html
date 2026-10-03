@@ -1,1 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0B0907">
+<meta name="description" content="MIEMARIUN — Architectural Studio">
+<title>MIEMARIUN — Architectural Studio</title>
+<style>
+:root{
+  --bg:#0B0907;--card:#17130f;--line:#30271f;--gold:#D4B277;
+  --text:#F6F3EC;--muted:#A9A198;--max:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,a{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.page{min-height:100vh}
+.container{width:min(calc(100% - 32px),var(--max));margin:auto}
+.header{position:sticky;top:0;z-index:20;background:rgba(11,9,7,.88);backdrop-filter:blur(16px);border-bottom:1px solid rgba(212,178,119,.12)}
+.header-inner{height:68px;display:flex;align-items:center;justify-content:space-between}
+.logo{letter-spacing:.16em;font-size:14px;font-weight:700}
+.nav{display:flex;gap:24px;color:var(--muted);font-size:12px;letter-spacing:.12em}
+.nav a.active,.nav a:hover{color:var(--gold)}
+.menu{display:none;background:none;border:0;color:var(--text);font-size:25px}
+.landing{min-height:100svh;display:grid;place-items:center;position:relative;overflow:hidden}
+.landing:before{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 70% 30%,rgba(212,178,119,.18),transparent 32%),
+    linear-gradient(135deg,#15100c 0%,#0B0907 52%,#20170f 100%);
+}
+.landing:after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(11,9,7,.9),transparent 55%,rgba(11,9,7,.35))}
+.landing-content{position:relative;z-index:1;text-align:center;padding:32px}
+.mark{font-size:clamp(34px,8vw,76px);letter-spacing:.22em;font-weight:300;margin-left:.22em}
+.subtitle{margin:18px 0 34px;color:var(--muted);letter-spacing:.28em;font-size:10px}
+.enter{border:1px solid var(--gold);background:transparent;color:var(--text);padding:14px 26px;letter-spacing:.18em;font-size:11px}
+.enter:hover{background:var(--gold);color:#0B0907}
+.section{padding:80px 0}
+.hero{min-height:calc(100svh - 68px);display:flex;align-items:center}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.eyebrow{color:var(--gold);letter-spacing:.2em;font-size:11px}
+h1{font-size:clamp(40px,7vw,82px);line-height:.98;font-weight:400;margin:18px 0}
+.lead{color:var(--muted);max-width:520px;line-height:1.7}
+.hero-portrait{aspect-ratio:4/5;border:1px solid var(--line);background:
+  radial-gradient(circle at 50% 25%,#8f7354 0 8%,transparent 9%),
+  radial-gradient(ellipse at 50% 48%,#514234 0 18%,transparent 19%),
+  linear-gradient(145deg,#2a2119,#100d0a 60%,#3a2a1b);
+}
+.cta{display:inline-block;margin-top:28px;border:1px solid var(--gold);padding:14px 20px;font-size:11px;letter-spacing:.16em}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 34px}
+.filter{border:1px solid var(--line);background:transparent;color:var(--muted);padding:9px 13px;font-size:10px;letter-spacing:.12em}
+.filter.active,.filter:hover{border-color:var(--gold);color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.card{background:var(--card);border:1px solid var(--line);overflow:hidden;transition:.25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(212,178,119,.5)}
+.card-image{aspect-ratio:16/10;background:
+  linear-gradient(135deg,rgba(212,178,119,.25),transparent 45%),
+  linear-gradient(160deg,#4b4035,#18130f 55%,#2d2117);
+}
+.card:nth-child(2) .card-image{background:linear-gradient(135deg,#28302e,#111513 55%,#574b3b)}
+.card:nth-child(3) .card-image{background:linear-gradient(135deg,#39302a,#14100d 55%,#705e49)}
+.card:nth-child(4) .card-image{background:linear-gradient(135deg,#222a31,#101316 55%,#4e463e)}
+.card-body{padding:18px}
+.num{color:var(--gold);font-size:10px;letter-spacing:.16em}
+.title{font-size:19px;margin:8px 0}
+.meta{color:var(--muted);font-size:11px}
+.arrow{float:right;color:var(--gold)}
+.about{display:grid;grid-template-columns:.8fr 1.2fr;gap:60px}
+.bio{font-size:clamp(20px,3vw,30px);line-height:1.35;font-weight:300}
+.stats{display:flex;gap:50px;margin:34px 0}
+.stat strong{display:block;font-size:36px;font-weight:400;color:var(--gold)}
+.stat span{font-size:10px;letter-spacing:.14em;color:var(--muted)}
+.contacts{display:grid;gap:10px;color:var(--muted);font-size:13px}
+.contacts a:hover{color:var(--gold)}
+.project-view{display:none}
+.project-view.open{display:block}
+.work-view.hidden,.about-view.hidden,.home-view.hidden{display:none}
+.project-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.back{background:none;border:0;color:var(--muted);padding:0;font-size:11px;letter-spacing:.12em}
+.gallery{position:relative}
+.gallery-image{aspect-ratio:16/10;background:linear-gradient(135deg,#51463a,#17120e 55%,#826c50)}
+.gallery-controls{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.gallery-controls button{background:none;border:0;color:var(--text);font-size:22px}
+.project-info{padding:30px 0 80px}
+.project-info h2{font-size:34px;font-weight:400;margin:8px 0}
+.project-info p{color:var(--muted);line-height:1.7;max-width:680px}
+.footer{padding:30px 0;border-top:1px solid var(--line);color:#706960;font-size:10px;letter-spacing:.1em}
+@media(max-width:760px){
+  .nav{display:none}.menu{display:block}
+  .hero-grid,.about{grid-template-columns:1fr;gap:28px}
+  .hero{padding:55px 0}.hero-portrait{max-width:420px}
+  .grid{grid-template-columns:1fr}
+  .section{padding:60px 0}
+  .stats{gap:28px}
+}
+</style>
+</head>
+<body>
+<div id="landing" class="landing">
+  <div class="landing-content">
+    <div class="mark">MIEMARIUN</div>
+    <div class="subtitle">ARCHITECTURAL STUDIO</div>
+    <button class="enter" onclick="enterPortfolio()">ENTER PORTFOLIO</button>
+  </div>
+</div>
 
+<div id="site" class="page" hidden>
+<header class="header">
+  <div class="container header-inner">
+    <a class="logo" href="#home" onclick="showView('home')">MIEMARIUN</a>
+    <nav class="nav">
+      <a id="nav-work" href="#work" onclick="showView('work')">WORK</a>
+      <a id="nav-about" href="#about" onclick="showView('about')">ABOUT</a>
+    </nav>
+    <button class="menu" aria-label="Menu" onclick="toggleMenu()">☰</button>
+  </div>
+</header>
+
+<main>
+<section id="home" class="home-view">
+  <div class="container hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">ARCHITECTURAL STUDIO</div>
+        <h1>Architecture<br>that creates value.</h1>
+        <p class="lead">Architecture, interior and masterplanning with a focus on clear ideas, strong proportions and spaces made to be used.</p>
+        <a class="cta" href="tel:+00000000000">CONTACT</a>
+      </div>
+      <div class="hero-portrait" aria-label="Portrait placeholder"></div>
+    </div>
+  </div>
+</section>
+
+<section id="work" class="work-view hidden section">
+  <div class="container">
+    <div class="eyebrow">SELECTED WORK</div>
+    <div class="filters">
+      <button class="filter active" onclick="filterWork('ALL',this)">ALL</button>
+      <button class="filter" onclick="filterWork('RESIDENTIAL',this)">RESIDENTIAL</button>
+      <button class="filter" onclick="filterWork('PUBLIC',this)">PUBLIC</button>
+      <button class="filter" onclick="filterWork('COMMERCIAL',this)">COMMERCIAL</button>
+      <button class="filter" onclick="filterWork('MASTERPLAN',this)">MASTERPLAN</button>
+    </div>
+    <div id="projectGrid" class="grid"></div>
+  </div>
+</section>
+
+<section id="about" class="about-view hidden section">
+  <div class="container about">
+    <div>
+      <div class="eyebrow">ABOUT</div>
+      <h2 style="font-size:48px;font-weight:400;margin:14px 0">MIEMARIUN</h2>
+      <div class="meta">ARCHITECT</div>
+    </div>
+    <div>
+      <p class="bio">Я архитектор с более чем 10-летним опытом. За это время я работал над разными проектами — от частных домов и интерьеров до общественных зданий и мастер-планов. Для меня архитектура — это не только форма, но и пространство, которым хочется пользоваться и жить в нём.</p>
+      <div class="stats">
+        <div class="stat"><strong>10+</strong><span>YEARS OF EXPERIENCE</span></div>
+        <div class="stat"><strong>XX+</strong><span>COMPLETED PROJECTS</span></div>
+      </div>
+      <div class="eyebrow" style="margin-bottom:12px">DIRECTIONS</div>
+      <p class="meta">ARCHITECTURE · INTERIOR · MASTERPLAN</p>
+      <div class="eyebrow" style="margin:28px 0 12px">CONTACT</div>
+      <div class="contacts">
+        <a href="tel:+00000000000">Phone</a>
+        <a href="https://t.me/" target="_blank" rel="noopener">Telegram</a>
+        <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a>
+        <a href="mailto:your@email.com">E-mail</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="project" class="project-view section">
+  <div class="container">
+    <div class="project-top">
+      <button class="back" onclick="showView('work')">← BACK TO WORK</button>
+      <span id="projectCounter" class="meta">01 / 04</span>
+    </div>
+    <div class="gallery">
+      <div id="galleryImage" class="gallery-image"></div>
+      <div class="gallery-controls">
+        <button onclick="prevImage()">←</button>
+        <span id="imageLabel" class="meta">IMAGE 01</span>
+        <button onclick="nextImage()">→</button>
+      </div>
+    </div>
+    <div class="project-info">
+      <div id="projectType" class="eyebrow"></div>
+      <h2 id="projectTitle"></h2>
+      <div id="projectMeta" class="meta"></div>
+      <p id="projectDescription"></p>
+      <button class="back" onclick="nextProject()">NEXT PROJECT →</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer"><div class="container">MIEMARIUN / ARCHITECTURAL STUDIO</div></footer>
+</div>
+
+<script>
+const projects=[
+ {id:1,type:'RESIDENTIAL',title:'PRIVATE RESIDENCE',location:'Tashkent, Uzbekistan',year:'2026',desc:'Contemporary residential architecture focused on proportion, material and everyday spatial experience.'},
+ {id:2,type:'COMMERCIAL',title:'OFFICE BUILDING',location:'Tashkent, Uzbekistan',year:'2026',desc:'A compact contemporary office concept with a clear structural rhythm and public-facing ground floor.'},
+ {id:3,type:'PUBLIC',title:'MOSQUE',location:'Uzbekistan',year:'2026',desc:'A contemporary Islamic architecture concept balancing recognizable tradition with a restrained modern expression.'},
+ {id:4,type:'MASTERPLAN',title:'RESIDENTIAL MASTERPLAN',location:'Uzbekistan',year:'2026',desc:'A residential planning concept organized around movement, landscape and clear pedestrian spaces.'}
+];
+let currentProject=0,currentImage=0;
+const totalImages=6;
+
+function enterPortfolio(){
+ document.getElementById('landing').hidden=true;
+ document.getElementById('site').hidden=false;
+ showView('home');
+}
+function showView(view){
+ document.querySelectorAll('.home-view,.work-view,.about-view').forEach(x=>x.classList.add('hidden'));
+ document.getElementById('project').classList.remove('open');
+ if(view==='home')document.getElementById('home').classList.remove('hidden');
+ if(view==='work'){document.getElementById('work').classList.remove('hidden');renderProjects('ALL')}
+ if(view==='about')document.getElementById('about').classList.remove('hidden');
+ if(view==='project'){document.getElementById('project').classList.add('open');renderProject()}
+ window.scrollTo({top:0,behavior:'smooth'});
+ document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
+ const n=document.getElementById('nav-'+view); if(n)n.classList.add('active');
+}
+function toggleMenu(){
+ const nav=document.querySelector('.nav');
+ nav.style.display=nav.style.display==='flex'?'none':'flex';
+}
+function renderProjects(filter){
+ const grid=document.getElementById('projectGrid');
+ grid.innerHTML=projects.filter(p=>filter==='ALL'||p.type===filter).map(p=>`
+ <article class="card" onclick="openProject(${p.id-1})">
+  <div class="card-image"></div>
+  <div class="card-body">
+   <div class="num">${String(p.id).padStart(2,'0')} <span class="arrow">↗</span></div>
+   <div class="title">${p.title}</div>
+   <div class="meta">${p.location} · ${p.year}</div>
+  </div>
+ </article>`).join('');
+}
+function filterWork(filter,btn){
+ document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');
+ renderProjects(filter);
+}
+function openProject(index){currentProject=index;currentImage=0;showView('project')}
+function renderProject(){
+ const p=projects[currentProject];
+ document.getElementById('projectCounter').textContent=`${String(currentProject+1).padStart(2,'0')} / ${String(projects.length).padStart(2,'0')}`;
+ document.getElementById('projectType').textContent=p.type;
+ document.getElementById('projectTitle').textContent=p.title;
+ document.getElementById('projectMeta').textContent=`${p.location} · ${p.year}`;
+ document.getElementById('projectDescription').textContent=p.desc;
+ updateGallery();
+}
+function updateGallery(){
+ document.getElementById('imageLabel').textContent=`IMAGE ${String(currentImage+1).padStart(2,'0')}`;
+ const image=document.getElementById('galleryImage');
+ image.style.background=`linear-gradient(135deg, rgba(212,178,119,${.12+.05*currentImage}), transparent 48%), linear-gradient(${120+currentImage*18}deg,#${['51463a','303b3a','3e3026','273038','514a40','34271f'][currentImage]},#11100e 58%,#${['806a4e','65736e','765d45','586875','7a6b58','6d4e35'][currentImage]})`;
+}
+function nextImage(){currentImage=(currentImage+1)%totalImages;updateGallery()}
+function prevImage(){currentImage=(currentImage-1+totalImages)%totalImages;updateGallery()}
+function nextProject(){currentProject=(currentProject+1)%projects.length;currentImage=0;renderProject()}
+renderProjects('ALL');
+</script>
+</body>
+</html>
