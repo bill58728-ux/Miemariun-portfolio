@@ -5,100 +5,184 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MIEMARIUN — Admin</title>
 <style>
-:root{--bg:#0b0907;--card:#17130f;--card2:#1d1813;--line:#30271d;--gold:#d4b277;--text:#f6f3ec;--muted:#9d958a}
-*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
-button,input,textarea,select{font:inherit} button{cursor:pointer}
-.wrap{max-width:1180px;margin:auto;padding:28px 20px 60px}
-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:28px}
-.brand{letter-spacing:.18em;font-size:14px}.admin-label{color:var(--muted);font-size:11px;letter-spacing:.16em}
-.layout{display:grid;grid-template-columns:300px 1fr;gap:22px}
+:root{--bg:#0b0907;--card:#17130f;--card2:#1d1813;--line:#30271d;--gold:#d4b277;--text:#f6f3ec;--muted:#9d958a;--danger:#b9786b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.wrap{max-width:1200px;margin:auto;padding:28px 20px 70px}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:26px}
+.brand{letter-spacing:.18em;font-size:14px}.admin-label{color:var(--muted);font-size:10px;letter-spacing:.16em;margin-top:4px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
-.panel h2{font-size:13px;letter-spacing:.16em;margin:0 0 16px}
-.project-list{display:flex;flex-direction:column;gap:8px}
-.project-item{display:flex;gap:12px;align-items:center;padding:13px;border:1px solid transparent;border-radius:12px;background:#120f0c}
-.project-item.active{border-color:var(--gold)}
-.num{color:var(--gold);font-size:11px;width:24px}.pname{font-size:13px;flex:1}.ptype{font-size:9px;color:var(--muted);letter-spacing:.12em}
+.layout{display:grid;grid-template-columns:310px 1fr;gap:22px}
+.panel h2{font-size:12px;letter-spacing:.16em;margin:0 0 16px}
+.panel h3{font-size:11px;letter-spacing:.14em;margin:4px 0 12px}
+.notice{margin-bottom:20px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:11px;line-height:1.5}
 .add{width:100%;margin-bottom:14px;padding:13px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:10px}
+.project-list{display:flex;flex-direction:column;gap:8px}
+.project-item{display:flex;gap:9px;align-items:center;padding:12px;border:1px solid transparent;border-radius:12px;background:#120f0c}
+.project-item.active{border-color:var(--gold)}
+.project-item.dragging{opacity:.45}.drag{color:var(--muted);cursor:grab;font-size:15px}.num{color:var(--gold);font-size:10px;width:22px}.pname{font-size:12px;flex:1}.ptype{font-size:8px;color:var(--muted);letter-spacing:.1em}
+.list-actions{display:flex;gap:6px;margin-top:12px}.list-actions button{flex:1}
+.btn{border:1px solid var(--line);background:transparent;color:var(--text);padding:10px 15px;border-radius:10px}.primary{border-color:var(--gold);color:var(--gold)}.danger{color:var(--danger)}
 .form{display:grid;gap:18px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-label{display:grid;gap:7px;color:var(--muted);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+label{display:grid;gap:7px;color:var(--muted);font-size:9px;letter-spacing:.12em;text-transform:uppercase}
 input,textarea,select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--text);border-radius:10px;padding:12px;outline:none}
 textarea{min-height:120px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--gold)}
-.drop{border:1px dashed #514536;border-radius:12px;padding:18px;text-align:center;color:var(--muted);background:#120f0c}
-.drop input{display:none}.drop strong{display:block;color:var(--text);font-size:12px;margin-bottom:5px}
-.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.photo{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#0f0d0a;border:1px solid var(--line)}
-.photo img{width:100%;height:100%;object-fit:cover}.photo button{position:absolute;right:6px;top:6px;border:0;border-radius:50%;width:26px;height:26px;background:#0b0907cc;color:#fff}
-.actions{display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--line);padding-top:18px}
-.btn{border:1px solid var(--line);background:transparent;color:var(--text);padding:11px 17px;border-radius:10px}.primary{border-color:var(--gold);color:var(--gold)}
+.drop{border:1px dashed #514536;border-radius:12px;padding:18px;text-align:center;color:var(--muted);background:#120f0c}.drop input{display:none}.drop strong{display:block;color:var(--text);font-size:12px;margin-bottom:5px}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.photo{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#0f0d0a;border:1px solid var(--line)}.photo.dragging{opacity:.35}.photo img{width:100%;height:100%;object-fit:cover}.photo button{position:absolute;right:6px;top:6px;border:0;border-radius:50%;width:26px;height:26px;background:#0b0907cc;color:#fff}
+.photo .order{position:absolute;left:6px;top:6px;padding:4px 7px;border-radius:8px;background:#0b0907cc;color:var(--gold);font-size:9px}
+.section-box{border-top:1px solid var(--line);padding-top:18px}
+.status{display:flex;gap:10px}.status label{display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:11px;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}.status input{width:auto}
+.actions{display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--line);padding-top:18px;flex-wrap:wrap}
 .empty{color:var(--muted);font-size:12px;line-height:1.6;padding:20px 0}
-.notice{margin-bottom:20px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;color:var(--muted);font-size:11px}
-@media(max-width:800px){.layout{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.photos{grid-template-columns:repeat(2,1fr)}}
+.tabs{display:flex;gap:8px;margin-bottom:18px}.tab{padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--muted)}.tab.active{color:var(--gold);border-color:var(--gold)}
+.preview{background:#0b0907;border:1px solid var(--line);border-radius:14px;overflow:hidden}.preview-cover{height:280px;background:#17130f center/cover no-repeat;display:flex;align-items:flex-end;padding:20px}.preview-copy{background:#0b0907;padding:20px}.preview-copy h2{margin:0 0 8px;font-size:25px}.preview-copy p{color:var(--muted);line-height:1.6;font-size:12px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.photos{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header><div><div class="brand">MIEMARIUN</div><div class="admin-label">ARCHITECTURAL STUDIO · ADMIN</div></div><button class="btn" onclick="window.location.href='index.html'">VIEW SITE</button></header>
-<div class="notice">Prototype only: changes are stored in this browser for now. GitHub publishing will be connected in the next step.</div>
+<header>
+<div><div class="brand">MIEMARIUN</div><div class="admin-label">ARCHITECTURAL STUDIO · ADMIN</div></div>
+<button class="btn" onclick="location.href='index.html'">VIEW SITE</button>
+</header>
+
+<div class="notice">Prototype only: changes are stored in this browser for now. GitHub publishing will be connected after the admin structure is approved.</div>
+
+<div class="tabs">
+<button class="tab active" id="tabProjects" onclick="switchTab('projects')">PROJECTS</button>
+<button class="tab" id="tabContent" onclick="switchTab('content')">SITE CONTENT</button>
+<button class="tab" id="tabSettings" onclick="switchTab('settings')">SETTINGS</button>
+</div>
+
+<div id="projectsTab">
 <div class="layout">
 <aside class="panel">
 <h2>PROJECTS</h2>
 <button class="add" onclick="newProject()">+ ADD PROJECT</button>
 <div id="projectList" class="project-list"></div>
+<div class="list-actions">
+<button class="btn" onclick="saveOrder()">SAVE ORDER</button>
+</div>
 </aside>
-<main class="panel">
-<div id="editor"></div>
-</main>
+
+<main class="panel"><div id="editor"></div></main>
 </div>
 </div>
+
+<div id="contentTab" style="display:none"><div class="panel">
+<h2>SITE CONTENT</h2>
+<div class="form">
+<label>About<textarea id="aboutText"></textarea></label>
+<div class="grid2">
+<label>Years of experience<input id="years"></label>
+<label>Projects count<input id="projectCount"></label>
+</div>
+<div class="grid2">
+<label>Direction 01<input id="dir1"></label>
+<label>Direction 02<input id="dir2"></label>
+</div>
+<label>Direction 03<input id="dir3"></label>
+<div class="section-box"><h3>CONTACT</h3>
+<div class="grid2">
+<label>Phone<input id="phone"></label>
+<label>Telegram<input id="telegram"></label>
+</div>
+<div class="grid2">
+<label>Instagram<input id="instagram"></label>
+<label>E-mail<input id="email"></label>
+</div>
+</div>
+<div class="actions"><button class="btn primary" onclick="saveContent()">SAVE SITE CONTENT</button></div>
+</div>
+</div></div>
+
+<div id="settingsTab" style="display:none"><div class="panel">
+<h2>SITE SETTINGS</h2>
+<div class="form">
+<div class="grid2">
+<label>Studio name<input id="studioName"></label>
+<label>Default project status<select id="defaultStatus"><option value="DRAFT">DRAFT</option><option value="PUBLISHED">PUBLISHED</option></select></label>
+</div>
+<div class="actions"><button class="btn primary" onclick="saveSettings()">SAVE SETTINGS</button></div>
+</div>
+</div></div>
+</div>
+
 <script>
-const KEY='miemariun_admin_projects_v1';
+const KEY='miemariun_admin_projects_v2', CONTENT='miemariun_admin_content_v1', SETTINGS='miemariun_admin_settings_v1';
 let projects=JSON.parse(localStorage.getItem(KEY)||'null')||[
-{id:1,title:'PRIVATE RESIDENCE',category:'RESIDENTIAL',location:'Tashkent, Uzbekistan',year:'2026',description:'Contemporary residential architecture focused on proportion, material and everyday spatial experience.',cover:'',gallery:[]},
-{id:2,title:'OFFICE BUILDING',category:'COMMERCIAL',location:'Tashkent, Uzbekistan',year:'2026',description:'A compact contemporary office concept with a clear structural rhythm and public-facing ground floor.',cover:'',gallery:[]}
+{id:1,title:'PRIVATE RESIDENCE',category:'RESIDENTIAL',location:'Tashkent, Uzbekistan',year:'2026',description:'Contemporary residential architecture focused on proportion, material and everyday spatial experience.',status:'PUBLISHED',cover:'',gallery:[]},
+{id:2,title:'OFFICE BUILDING',category:'COMMERCIAL',location:'Tashkent, Uzbekistan',year:'2026',description:'A compact contemporary office concept with a clear structural rhythm and public-facing ground floor.',status:'PUBLISHED',cover:'',gallery:[]}
 ];
-let selected=0;
-function save(){localStorage.setItem(KEY,JSON.stringify(projects));renderList()}
+let content=JSON.parse(localStorage.getItem(CONTENT)||'null')||{about:'',years:'10+',projectCount:'',dir1:'ARCHITECTURE',dir2:'INTERIOR',dir3:'MASTERPLAN',phone:'',telegram:'',instagram:'',email:''};
+let settings=JSON.parse(localStorage.getItem(SETTINGS)||'null')||{studioName:'MIEMARIUN / ARCHITECTURAL STUDIO',defaultStatus:'DRAFT'};
+let selected=0, dragProjectIndex=null, dragPhotoIndex=null;
+
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function attr(s=''){return esc(s)}
+function persist(){localStorage.setItem(KEY,JSON.stringify(projects))}
 function renderList(){
  const el=document.getElementById('projectList');
- el.innerHTML=projects.map((p,i)=>`<div class="project-item ${i===selected?'active':''}" onclick="selectProject(${i})"><span class="num">${String(i+1).padStart(2,'0')}</span><span class="pname">${esc(p.title||'UNTITLED')}</span><span class="ptype">${esc(p.category||'')}</span></div>`).join('');
+ el.innerHTML=projects.map((p,i)=>`<div class="project-item ${i===selected?'active':''}" draggable="true" data-index="${i}" onclick="selectProject(${i})" ondragstart="dragProjectStart(event,${i})" ondragover="event.preventDefault()" ondrop="dropProject(event,${i})">
+ <span class="drag">↕</span><span class="num">${String(i+1).padStart(2,'0')}</span><span class="pname">${esc(p.title||'UNTITLED')}</span><span class="ptype">${esc(p.status||'DRAFT')}</span></div>`).join('');
 }
 function selectProject(i){selected=i;renderList();renderEditor()}
-function newProject(){projects.push({id:Date.now(),title:'NEW PROJECT',category:'RESIDENTIAL',location:'',year:'2026',description:'',cover:'',gallery:[]});selected=projects.length-1;save();renderEditor()}
+function newProject(){projects.push({id:Date.now(),title:'NEW PROJECT',category:'RESIDENTIAL',location:'',year:'2026',description:'',status:settings.defaultStatus,cover:'',gallery:[]});selected=projects.length-1;persist();renderList();renderEditor()}
 function renderEditor(){
- const p=projects[selected]; if(!p){document.getElementById('editor').innerHTML='<div class="empty">No project selected.</div>';return}
+ const p=projects[selected];
+ if(!p){document.getElementById('editor').innerHTML='<div class="empty">No project selected.</div>';return}
  document.getElementById('editor').innerHTML=`
  <div class="form">
- <div class="grid2">
- <label>Title<input id="title" value="${attr(p.title)}"></label>
- <label>Category<select id="category">${['RESIDENTIAL','PUBLIC','COMMERCIAL','MASTERPLAN'].map(x=>`<option ${x===p.category?'selected':''}>${x}</option>`).join('')}</select></label>
- </div>
- <div class="grid2">
- <label>Location<input id="location" value="${attr(p.location)}"></label>
- <label>Year<input id="year" value="${attr(p.year)}"></label>
- </div>
+ <div class="grid2"><label>Title<input id="title" value="${attr(p.title)}"></label>
+ <label>Category<select id="category">${['RESIDENTIAL','PUBLIC','COMMERCIAL','MASTERPLAN'].map(x=>`<option ${x===p.category?'selected':''}>${x}</option>`).join('')}</select></label></div>
+ <div class="grid2"><label>Location<input id="location" value="${attr(p.location)}"></label><label>Year<input id="year" value="${attr(p.year)}"></label></div>
  <label>Description<textarea id="description">${esc(p.description)}</textarea></label>
- <label>Cover image
- <div class="drop"><strong>UPLOAD COVER</strong><span>Choose one image</span><input id="coverInput" type="file" accept="image/*" onchange="loadCover(event)"></div>
- </label>
- <div class="photos">${p.cover?photo(p.cover,'cover'):''}</div>
- <label>Gallery
- <div class="drop"><strong>ADD PHOTOS</strong><span>Choose multiple images</span><input id="galleryInput" type="file" accept="image/*" multiple onchange="loadGallery(event)"></div>
- </label>
+ <div><h3>STATUS</h3><div class="status">
+ <label><input type="radio" name="status" value="DRAFT" ${p.status==='DRAFT'?'checked':''}> DRAFT</label>
+ <label><input type="radio" name="status" value="PUBLISHED" ${p.status==='PUBLISHED'?'checked':''}> PUBLISHED</label>
+ </div></div>
+ <label>Cover image<div class="drop"><strong>UPLOAD COVER</strong><span>Choose one image</span><input id="coverInput" type="file" accept="image/*" onchange="loadCover(event)"></div></label>
+ <div class="photos">${p.cover?photo(p.cover,'cover',0):''}</div>
+ <label>Gallery<div class="drop"><strong>ADD PHOTOS</strong><span>Choose multiple images · drag to reorder</span><input id="galleryInput" type="file" accept="image/*" multiple onchange="loadGallery(event)"></div></label>
  <div class="photos">${p.gallery.map((x,i)=>photo(x,'gallery',i)).join('')}</div>
- <div class="actions"><button class="btn" onclick="deleteProject()">DELETE PROJECT</button><button class="btn primary" onclick="saveProject()">SAVE PROJECT</button></div>
+ <div class="actions">
+ <button class="btn" onclick="previewProject()">PREVIEW</button>
+ <button class="btn" onclick="duplicateProject()">DUPLICATE</button>
+ <button class="btn danger" onclick="deleteProject()">DELETE PROJECT</button>
+ <button class="btn primary" onclick="saveProject()">SAVE PROJECT</button>
+ </div>
  </div>`;
 }
-function photo(src,type,i){return `<div class="photo"><img src="${src}"><button onclick="${type==='cover'?'removeCover()':`removeGallery(${i})`}">×</button></div>`}
+function photo(src,type,i){return `<div class="photo" draggable="${type==='gallery'}" ${type==='gallery'?`ondragstart="dragPhotoStart(event,${i})" ondragover="event.preventDefault()" ondrop="dropPhoto(event,${i})"`:''}><span class="order">${type==='gallery'?String(i+1).padStart(2,'0'):'COVER'}</span><img src="${src}"><button onclick="${type==='cover'?'removeCover()':`removeGallery(${i})`}">×</button></div>`}
 function saveProject(){
- const p=projects[selected];p.title=document.getElementById('title').value;p.category=document.getElementById('category').value;p.location=document.getElementById('location').value;p.year=document.getElementById('year').value;p.description=document.getElementById('description').value;save();renderEditor();
+ const p=projects[selected];p.title=document.getElementById('title').value;p.category=document.getElementById('category').value;p.location=document.getElementById('location').value;p.year=document.getElementById('year').value;p.description=document.getElementById('description').value;p.status=document.querySelector('input[name=status]:checked').value;
+ persist();renderList();renderEditor();
 }
-function deleteProject(){if(!confirm('Delete this project?'))return;projects.splice(selected,1);selected=Math.max(0,selected-1);save();renderEditor()}
+function deleteProject(){if(!confirm('Delete this project and its gallery?'))return;projects.splice(selected,1);selected=Math.max(0,selected-1);persist();renderList();renderEditor()}
+function duplicateProject(){const copy=JSON.parse(JSON.stringify(projects[selected]));copy.id=Date.now();copy.title=(copy.title||'PROJECT')+' — COPY';projects.splice(selected+1,0,copy);selected++;persist();renderList();renderEditor()}
 function loadCover(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{projects[selected].cover=r.result;renderEditor()};r.readAsDataURL(f)}
 function loadGallery(e){[...e.target.files].forEach(f=>{const r=new FileReader();r.onload=()=>{projects[selected].gallery.push(r.result);renderEditor()};r.readAsDataURL(f)})}
 function removeCover(){projects[selected].cover='';renderEditor()}
 function removeGallery(i){projects[selected].gallery.splice(i,1);renderEditor()}
-function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function attr(s=''){return esc(s)}
+function dragProjectStart(e,i){dragProjectIndex=i;e.dataTransfer.effectAllowed='move'}
+function dropProject(e,target){e.preventDefault();if(dragProjectIndex===null||dragProjectIndex===target)return;const [item]=projects.splice(dragProjectIndex,1);projects.splice(target,0,item);selected=target;dragProjectIndex=null;renderList();renderEditor()}
+function saveOrder(){persist();alert('Project order saved in this browser.')}
+function dragPhotoStart(e,i){dragPhotoIndex=i;e.dataTransfer.effectAllowed='move'}
+function dropPhoto(e,target){e.preventDefault();if(dragPhotoIndex===null||dragPhotoIndex===target)return;const g=projects[selected].gallery;const [item]=g.splice(dragPhotoIndex,1);g.splice(target,0,item);dragPhotoIndex=null;renderEditor()}
+function previewProject(){
+ const p=projects[selected];const win=window.open('','_blank');if(!win)return;
+ win.document.write(`<html><head><title>${esc(p.title)}</title><style>body{margin:0;background:#0b0907;color:#f6f3ec;font-family:Arial}.hero{height:65vh;background:#17130f center/cover no-repeat;display:flex;align-items:flex-end;padding:30px}.copy{padding:30px;max-width:760px}small{letter-spacing:.16em;color:#d4b277}h1{font-size:44px;margin:10px 0}p{color:#aaa;line-height:1.7}</style></head><body><div class="hero" style="background-image:url('${p.cover||''}')"><div class="copy"><small>${esc(p.category)} · ${esc(p.location)} · ${esc(p.year)}</small><h1>${esc(p.title)}</h1><p>${esc(p.description)}</p></div></div></body></html>`);
+ win.document.close();
+}
+function switchTab(tab){
+ ['projects','content','settings'].forEach(x=>document.getElementById(x+'Tab').style.display=x===tab?'block':'none');
+ document.getElementById('tabProjects').classList.toggle('active',tab==='projects');document.getElementById('tabContent').classList.toggle('active',tab==='content');document.getElementById('tabSettings').classList.toggle('active',tab==='settings');
+ if(tab==='content')loadContent();if(tab==='settings')loadSettings();
+}
+function loadContent(){aboutText.value=content.about;years.value=content.years;projectCount.value=content.projectCount;dir1.value=content.dir1;dir2.value=content.dir2;dir3.value=content.dir3;phone.value=content.phone;telegram.value=content.telegram;instagram.value=content.instagram;email.value=content.email}
+function saveContent(){content={about:aboutText.value,years:years.value,projectCount:projectCount.value,dir1:dir1.value,dir2:dir2.value,dir3:dir3.value,phone:phone.value,telegram:telegram.value,instagram:instagram.value,email:email.value};localStorage.setItem(CONTENT,JSON.stringify(content));alert('Site content saved in this browser.')}
+function loadSettings(){studioName.value=settings.studioName;defaultStatus.value=settings.defaultStatus}
+function saveSettings(){settings={studioName:studioName.value,defaultStatus:defaultStatus.value};localStorage.setItem(SETTINGS,JSON.stringify(settings));alert('Settings saved in this browser.')}
 renderList();renderEditor();
 </script>
 </body>
