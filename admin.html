@@ -34,7 +34,10 @@ textarea{min-height:120px;resize:vertical}input:focus,textarea:focus,select:focu
 .status{display:flex;gap:10px}.status label{display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:11px;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}.status input{width:auto}
 .actions{display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--line);padding-top:18px;flex-wrap:wrap}
 .empty{color:var(--muted);font-size:12px;line-height:1.6;padding:20px 0}
-.tabs{display:flex;gap:8px;margin-bottom:18px}.tab{padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--muted)}.tab.active{color:var(--gold);border-color:var(--gold)}
+.tabs{display:flex;gap:8px;margin-bottom:18px}
+.landing-preview{min-height:240px;border:1px solid var(--line);border-radius:14px;background:#0f0d0a;display:flex;align-items:center;justify-content:center;padding:24px;margin-bottom:12px;overflow:hidden}
+.landing-preview img{display:block;max-width:100%;max-height:300px;object-fit:contain}
+.tab{padding:9px 13px;border:1px solid var(--line);border-radius:9px;background:transparent;color:var(--muted)}.tab.active{color:var(--gold);border-color:var(--gold)}
 .preview{background:#0b0907;border:1px solid var(--line);border-radius:14px;overflow:hidden}.preview-cover{height:280px;background:#17130f center/cover no-repeat;display:flex;align-items:flex-end;padding:20px}.preview-copy{background:#0b0907;padding:20px}.preview-copy h2{margin:0 0 8px;font-size:25px}.preview-copy p{color:var(--muted);line-height:1.6;font-size:12px}
 @media(max-width:850px){.layout{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.photos{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -50,9 +53,31 @@ textarea{min-height:120px;resize:vertical}input:focus,textarea:focus,select:focu
 
 <div class="tabs">
 <button class="tab active" id="tabProjects" onclick="switchTab('projects')">PROJECTS</button>
+<button class="tab" id="tabLanding" onclick="switchTab('landing')">LANDING</button>
 <button class="tab" id="tabContent" onclick="switchTab('content')">SITE CONTENT</button>
 <button class="tab" id="tabSettings" onclick="switchTab('settings')">SETTINGS</button>
 </div>
+
+
+<div id="landingTab" style="display:none"><div class="panel">
+<h2>LANDING</h2>
+<div class="form">
+<div class="section-box" style="border-top:0;padding-top:0">
+<h3>CENTER IMAGE</h3>
+<div id="landingPreview" class="landing-preview"></div>
+<div class="drop">
+<strong>UPLOAD / REPLACE IMAGE</strong>
+<span>PNG, JPG or WebP · transparent PNG supported</span>
+<input id="landingInput" type="file" accept="image/png,image/jpeg,image/webp" onchange="loadLandingImage(event)">
+</div>
+</div>
+<div class="actions">
+<button class="btn" onclick="resetLandingImage()">RESET TO DEFAULT LOGO</button>
+<button class="btn primary" onclick="saveLanding()">SAVE LANDING</button>
+</div>
+<div id="landingMessage" class="notice" style="margin:0"></div>
+</div>
+</div></div>
 
 <div id="projectsTab">
 <div class="layout">
@@ -109,18 +134,29 @@ textarea{min-height:120px;resize:vertical}input:focus,textarea:focus,select:focu
 </div>
 
 <script>
-const KEY='miemariun_admin_projects_v2', CONTENT='miemariun_admin_content_v1', SETTINGS='miemariun_admin_settings_v1';
+const KEY='miemariun_admin_projects_v2', CONTENT='miemariun_admin_content_v1', SETTINGS='miemariun_admin_settings_v1', LANDING='miemariun_admin_landing_v1';
 let projects=JSON.parse(localStorage.getItem(KEY)||'null')||[
 {id:1,title:'PRIVATE RESIDENCE',category:'RESIDENTIAL',location:'Tashkent, Uzbekistan',year:'2026',description:'Contemporary residential architecture focused on proportion, material and everyday spatial experience.',status:'PUBLISHED',cover:'',gallery:[]},
 {id:2,title:'OFFICE BUILDING',category:'COMMERCIAL',location:'Tashkent, Uzbekistan',year:'2026',description:'A compact contemporary office concept with a clear structural rhythm and public-facing ground floor.',status:'PUBLISHED',cover:'',gallery:[]}
 ];
 let content=JSON.parse(localStorage.getItem(CONTENT)||'null')||{about:'',years:'10+',projectCount:'',dir1:'ARCHITECTURE',dir2:'INTERIOR',dir3:'MASTERPLAN',phone:'',telegram:'',instagram:'',email:''};
 let settings=JSON.parse(localStorage.getItem(SETTINGS)||'null')||{studioName:'MIEMARIUN / ARCHITECTURAL STUDIO',defaultStatus:'DRAFT'};
+let landingImage=localStorage.getItem(LANDING)||'';
+let landingPending=null;
 let selected=0, dragProjectIndex=null, dragPhotoIndex=null;
 
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function attr(s=''){return esc(s)}
-function persist(){localStorage.setItem(KEY,JSON.stringify(projects))}
+function persist(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(projects));
+    return true;
+  }catch(err){
+    console.error(err);
+    alert('Не удалось сохранить проект. Фотографии занимают слишком много места в памяти браузера. Они автоматически уменьшаются при загрузке; удалите несколько крупных фото и попробуйте снова.');
+    return false;
+  }
+}
 function renderList(){
  const el=document.getElementById('projectList');
  el.innerHTML=projects.map((p,i)=>`<div class="project-item ${i===selected?'active':''}" draggable="true" data-index="${i}" onclick="selectProject(${i})" ondragstart="dragProjectStart(event,${i})" ondragover="event.preventDefault()" ondrop="dropProject(event,${i})">
@@ -134,7 +170,7 @@ function renderEditor(){
  document.getElementById('editor').innerHTML=`
  <div class="form">
  <div class="grid2"><label>Title<input id="title" value="${attr(p.title)}"></label>
- <label>Category<select id="category">${['RESIDENTIAL','PUBLIC','COMMERCIAL','MASTERPLAN'].map(x=>`<option ${x===p.category?'selected':''}>${x}</option>`).join('')}</select></label></div>
+ <label>Category<select id="category">${['RESIDENTIAL','PUBLIC','COMMERCIAL','INTERIOR','MASTERPLAN'].map(x=>`<option ${x===p.category?'selected':''}>${x}</option>`).join('')}</select></label></div>
  <div class="grid2"><label>Location<input id="location" value="${attr(p.location)}"></label><label>Year<input id="year" value="${attr(p.year)}"></label></div>
  <label>Description<textarea id="description">${esc(p.description)}</textarea></label>
  <div><h3>STATUS</h3><div class="status">
@@ -155,18 +191,62 @@ function renderEditor(){
 }
 function photo(src,type,i){return `<div class="photo" draggable="${type==='gallery'}" ${type==='gallery'?`ondragstart="dragPhotoStart(event,${i})" ondragover="event.preventDefault()" ondrop="dropPhoto(event,${i})"`:''}><span class="order">${type==='gallery'?String(i+1).padStart(2,'0'):'COVER'}</span><img src="${src}"><button onclick="${type==='cover'?'removeCover()':`removeGallery(${i})`}">×</button></div>`}
 function saveProject(){
- const p=projects[selected];p.title=document.getElementById('title').value;p.category=document.getElementById('category').value;p.location=document.getElementById('location').value;p.year=document.getElementById('year').value;p.description=document.getElementById('description').value;p.status=document.querySelector('input[name=status]:checked').value;
- persist();renderList();renderEditor();
+ const p=projects[selected];
+ if(!p)return;
+ p.title=document.getElementById('title').value.trim();
+ p.category=document.getElementById('category').value;
+ p.location=document.getElementById('location').value.trim();
+ p.year=document.getElementById('year').value.trim();
+ p.description=document.getElementById('description').value.trim();
+ const status=document.querySelector('input[name=status]:checked');
+ p.status=status?status.value:'DRAFT';
+ if(persist()){
+   renderList();
+   renderEditor();
+   alert('Project saved in this browser.');
+ }
 }
 function deleteProject(){if(!confirm('Delete this project and its gallery?'))return;projects.splice(selected,1);selected=Math.max(0,selected-1);persist();renderList();renderEditor()}
 function duplicateProject(){const copy=JSON.parse(JSON.stringify(projects[selected]));copy.id=Date.now();copy.title=(copy.title||'PROJECT')+' — COPY';projects.splice(selected+1,0,copy);selected++;persist();renderList();renderEditor()}
-function loadCover(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{projects[selected].cover=r.result;renderEditor()};r.readAsDataURL(f)}
-function loadGallery(e){[...e.target.files].forEach(f=>{const r=new FileReader();r.onload=()=>{projects[selected].gallery.push(r.result);renderEditor()};r.readAsDataURL(f)})}
+function compressImage(file,maxSize=1200,quality=.76){
+ return new Promise((resolve,reject)=>{
+   const reader=new FileReader();
+   reader.onerror=reject;
+   reader.onload=()=>{
+     const img=new Image();
+     img.onerror=reject;
+     img.onload=()=>{
+       const scale=Math.min(1,maxSize/Math.max(img.width,img.height));
+       const w=Math.max(1,Math.round(img.width*scale));
+       const h=Math.max(1,Math.round(img.height*scale));
+       const canvas=document.createElement('canvas');
+       canvas.width=w;canvas.height=h;
+       const ctx=canvas.getContext('2d');
+       ctx.drawImage(img,0,0,w,h);
+       resolve(canvas.toDataURL('image/jpeg',quality));
+     };
+     img.src=reader.result;
+   };
+   reader.readAsDataURL(file);
+ });
+}
+async function loadCover(e){
+ const f=e.target.files[0];if(!f)return;
+ try{projects[selected].cover=await compressImage(f);renderEditor();}
+ catch(err){console.error(err);alert('Не удалось обработать изображение.');}
+}
+async function loadGallery(e){
+ const files=[...e.target.files];
+ for(const f of files){
+   try{projects[selected].gallery.push(await compressImage(f));renderEditor();}
+   catch(err){console.error(err);}
+ }
+}
 function removeCover(){projects[selected].cover='';renderEditor()}
 function removeGallery(i){projects[selected].gallery.splice(i,1);renderEditor()}
 function dragProjectStart(e,i){dragProjectIndex=i;e.dataTransfer.effectAllowed='move'}
 function dropProject(e,target){e.preventDefault();if(dragProjectIndex===null||dragProjectIndex===target)return;const [item]=projects.splice(dragProjectIndex,1);projects.splice(target,0,item);selected=target;dragProjectIndex=null;renderList();renderEditor()}
-function saveOrder(){persist();alert('Project order saved in this browser.')}
+function saveOrder(){if(persist())alert('Project order saved in this browser.')}
 function dragPhotoStart(e,i){dragPhotoIndex=i;e.dataTransfer.effectAllowed='move'}
 function dropPhoto(e,target){e.preventDefault();if(dragPhotoIndex===null||dragPhotoIndex===target)return;const g=projects[selected].gallery;const [item]=g.splice(dragPhotoIndex,1);g.splice(target,0,item);dragPhotoIndex=null;renderEditor()}
 function previewProject(){
@@ -175,15 +255,74 @@ function previewProject(){
  win.document.close();
 }
 function switchTab(tab){
- ['projects','content','settings'].forEach(x=>document.getElementById(x+'Tab').style.display=x===tab?'block':'none');
- document.getElementById('tabProjects').classList.toggle('active',tab==='projects');document.getElementById('tabContent').classList.toggle('active',tab==='content');document.getElementById('tabSettings').classList.toggle('active',tab==='settings');
- if(tab==='content')loadContent();if(tab==='settings')loadSettings();
+ ['projects','landing','content','settings'].forEach(x=>{
+   const el=document.getElementById(x+'Tab');
+   if(el) el.style.display=x===tab?'block':'none';
+ });
+ ['Projects','Landing','Content','Settings'].forEach(x=>{
+   const el=document.getElementById('tab'+x);
+   if(el) el.classList.toggle('active',tab===x.toLowerCase());
+ });
+ if(tab==='landing') renderLanding();
+ if(tab==='content') loadContent();
+ if(tab==='settings') loadSettings();
 }
+
+function renderLanding(){
+ const box=document.getElementById('landingPreview');
+ const msg=document.getElementById('landingMessage');
+ if(!box||!msg)return;
+ const current=landingPending!==null?landingPending:landingImage;
+ box.innerHTML=current ? `<img src="${current}" alt="Landing image preview">` : '<div class="empty">Default MIEMARIUN logo is active.</div>';
+ msg.textContent = current
+   ? 'Current landing image is selected. SAVE LANDING to keep it in this browser.'
+   : 'Default MIEMARIUN logo is active. You can replace it with a high-quality PNG at any time.';
+}
+function loadLandingImage(e){
+ const f=e.target.files[0];
+ if(!f)return;
+ if(f.type==='image/png' || f.type==='image/jpeg' || f.type==='image/webp'){
+   const r=new FileReader();
+   r.onload=()=>{
+     const data=r.result;
+     // Do not silently reduce quality. Check localStorage capacity before saving.
+     landingPending=data;
+     renderLanding();
+   };
+   r.readAsDataURL(f);
+ }
+}
+function resetLandingImage(){
+ landingPending='';
+ renderLanding();
+}
+function saveLanding(){
+ const value=landingPending!==null?landingPending:landingImage;
+ if(value===''){
+   localStorage.removeItem(LANDING);
+   landingImage='';
+   landingPending=null;
+   renderLanding();
+   alert('Landing reset to the default MIEMARIUN logo.');
+   return;
+ }
+ try{
+   localStorage.setItem(LANDING,value);
+   landingImage=value;
+   landingPending=null;
+   renderLanding();
+   alert('Landing image saved in this browser.');
+ }catch(err){
+   const msg=document.getElementById('landingMessage');
+   if(msg)msg.textContent='The image is too large for browser storage. It was not compressed or degraded. Use a smaller optimized file, or wait for GitHub storage to be connected.';
+ }
+}
+
 function loadContent(){aboutText.value=content.about;years.value=content.years;projectCount.value=content.projectCount;dir1.value=content.dir1;dir2.value=content.dir2;dir3.value=content.dir3;phone.value=content.phone;telegram.value=content.telegram;instagram.value=content.instagram;email.value=content.email}
 function saveContent(){content={about:aboutText.value,years:years.value,projectCount:projectCount.value,dir1:dir1.value,dir2:dir2.value,dir3:dir3.value,phone:phone.value,telegram:telegram.value,instagram:instagram.value,email:email.value};localStorage.setItem(CONTENT,JSON.stringify(content));alert('Site content saved in this browser.')}
 function loadSettings(){studioName.value=settings.studioName;defaultStatus.value=settings.defaultStatus}
 function saveSettings(){settings={studioName:studioName.value,defaultStatus:defaultStatus.value};localStorage.setItem(SETTINGS,JSON.stringify(settings));alert('Settings saved in this browser.')}
-renderList();renderEditor();
+renderList();renderEditor();renderLanding();
 </script>
 </body>
 </html>
